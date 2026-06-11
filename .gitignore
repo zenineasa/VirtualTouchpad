@@ -2,3 +2,5 @@
 .github
 .venv
 .vscode
+
+*.pyc

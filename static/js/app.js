@@ -204,6 +204,19 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
+        // Cross-references visual touch pointers with active touch events to prevent ghost circles
+        function pruneTouchIndicators(activeTouches) {
+            const activeIds = new Set();
+            for (let i = 0; i < activeTouches.length; i++) {
+                activeIds.add(activeTouches[i].identifier);
+            }
+            for (const id in touchIndicators) {
+                if (!activeIds.has(parseInt(id, 10)) && !activeIds.has(id)) {
+                    removeTouchIndicator(id);
+                }
+            }
+        }
+
         // Touch event handlers
         trackpad.addEventListener('touchstart', (e) => {
             e.preventDefault();
@@ -236,6 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 createTouchIndicator(e.touches[0].identifier, e.touches[0].clientX, e.touches[0].clientY);
                 createTouchIndicator(e.touches[1].identifier, e.touches[1].clientX, e.touches[1].clientY);
             }
+            pruneTouchIndicators(e.touches);
         }, { passive: false });
 
         trackpad.addEventListener('touchmove', (e) => {
@@ -272,6 +286,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     lastTouchY = avgY;
                 }
             }
+            pruneTouchIndicators(e.touches);
         }, { passive: false });
 
         trackpad.addEventListener('touchend', (e) => {
@@ -314,6 +329,7 @@ document.addEventListener('DOMContentLoaded', () => {
             isMoving = false;
             isScrolling = false;
             touchCount = e.touches.length;
+            pruneTouchIndicators(e.touches);
         }, { passive: false });
 
         trackpad.addEventListener('touchcancel', (e) => {
@@ -324,6 +340,7 @@ document.addEventListener('DOMContentLoaded', () => {
             isMoving = false;
             isScrolling = false;
             touchCount = 0;
+            pruneTouchIndicators(e.touches);
         });
 
         // ==================== MANUAL PHYSICAL BUTTON EVENTS ====================
@@ -455,22 +472,66 @@ document.addEventListener('DOMContentLoaded', () => {
             sliderPointer.value = pointerSensitivity;
             valPointer.textContent = pointerSensitivity.toFixed(1) + 'x';
             
-            sliderPointer.addEventListener('input', (e) => {
-                pointerSensitivity = parseFloat(e.target.value);
+            const updatePointerSens = (newVal) => {
+                pointerSensitivity = Math.max(0.1, Math.min(10.0, Math.round(newVal * 10) / 10));
+                sliderPointer.value = pointerSensitivity;
                 valPointer.textContent = pointerSensitivity.toFixed(1) + 'x';
                 localStorage.setItem('pointer_sens', pointerSensitivity);
+            };
+
+            sliderPointer.addEventListener('input', (e) => {
+                updatePointerSens(parseFloat(e.target.value));
             });
+
+            const btnDec = document.getElementById('btn-pointer-sens-dec');
+            const btnInc = document.getElementById('btn-pointer-sens-inc');
+            if (btnDec) {
+                btnDec.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    triggerHaptic();
+                    updatePointerSens(pointerSensitivity - 0.1);
+                });
+            }
+            if (btnInc) {
+                btnInc.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    triggerHaptic();
+                    updatePointerSens(pointerSensitivity + 0.1);
+                });
+            }
         }
 
         if (sliderScroll && valScroll) {
             sliderScroll.value = scrollSensitivity;
             valScroll.textContent = scrollSensitivity.toFixed(1) + 'x';
             
-            sliderScroll.addEventListener('input', (e) => {
-                scrollSensitivity = parseFloat(e.target.value);
+            const updateScrollSens = (newVal) => {
+                scrollSensitivity = Math.max(0.1, Math.min(10.0, Math.round(newVal * 10) / 10));
+                sliderScroll.value = scrollSensitivity;
                 valScroll.textContent = scrollSensitivity.toFixed(1) + 'x';
                 localStorage.setItem('scroll_sens', scrollSensitivity);
+            };
+
+            sliderScroll.addEventListener('input', (e) => {
+                updateScrollSens(parseFloat(e.target.value));
             });
+
+            const btnDec = document.getElementById('btn-scroll-sens-dec');
+            const btnInc = document.getElementById('btn-scroll-sens-inc');
+            if (btnDec) {
+                btnDec.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    triggerHaptic();
+                    updateScrollSens(scrollSensitivity - 0.1);
+                });
+            }
+            if (btnInc) {
+                btnInc.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    triggerHaptic();
+                    updateScrollSens(scrollSensitivity + 0.1);
+                });
+            }
         }
 
         // Drawer toggle interactions

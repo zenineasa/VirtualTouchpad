@@ -771,6 +771,46 @@ input[type="range"]:active::-webkit-slider-thumb {
     background: white;
 }
 
+/* Sensitivity Adjustment Layout & Buttons */
+.slider-control-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    margin-top: 4px;
+}
+
+.slider-control-container input[type="range"] {
+    flex: 1;
+}
+
+.sens-adj-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.03) !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-secondary) !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sens-adj-btn span {
+    font-size: 1.25rem;
+}
+
+.sens-adj-btn:active {
+    background: var(--accent-purple) !important;
+    color: white !important;
+    transform: scale(0.9);
+    border-color: rgba(168, 85, 247, 0.5) !important;
+    box-shadow: 0 0 10px rgba(168, 85, 247, 0.4);
+}
+
 /* Quick Guide Panel */
 .quick-gestures-panel {
     background: rgba(255, 255, 255, 0.02);

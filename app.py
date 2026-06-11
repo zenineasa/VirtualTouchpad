@@ -8,6 +8,31 @@ import Quartz
 import ApplicationServices
 from dotenv import load_dotenv
 
+# Force eager loading of PyObjC/Quartz functions and constants to avoid thread race conditions.
+# Flask-SocketIO runs event handlers concurrently on separate threads; lazy loading during these 
+# handlers causes PyObjC's lazy importer to raise KeyErrors (e.g. KeyError: 'CGEventGetLocation').
+_eager_preloads = [
+    Quartz.CGEventCreate,
+    Quartz.CGEventGetLocation,
+    Quartz.CGPoint,
+    Quartz.CGEventCreateMouseEvent,
+    Quartz.CGEventPost,
+    Quartz.CGWarpMouseCursorPosition,
+    Quartz.CGEventSetIntegerValueField,
+    Quartz.CGEventCreateScrollWheelEvent,
+    Quartz.CGEventCreateKeyboardEvent,
+    Quartz.kCGEventLeftMouseUp,
+    Quartz.kCGMouseButtonLeft,
+    Quartz.kCGEventLeftMouseDragged,
+    Quartz.kCGHIDEventTap,
+    Quartz.kCGEventLeftMouseDown,
+    Quartz.kCGMouseEventClickState,
+    Quartz.kCGEventRightMouseDown,
+    Quartz.kCGMouseButtonRight,
+    Quartz.kCGEventRightMouseUp,
+    ApplicationServices.AXIsProcessTrusted,
+]
+
 # Load optional .env variables
 load_dotenv()
 
